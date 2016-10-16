@@ -32,6 +32,10 @@ void Game::gameLoop() {
     Input input;
     SDL_Event event;
     
+    _player = AnimatedSprite(graphics, "content/sprites/MyChar.png", 0, 0, 16, 16, 100, 100, 100);
+    _player.setupAnimations();
+    _player.playAnimation("RunRight");
+    
     int LAST_UPDATE_TIME = SDL_GetTicks();
     // Start game loop
     while (true) {
@@ -59,13 +63,19 @@ void Game::gameLoop() {
         // If frame took more than max time, use max time. Limits game to 50 fps
         // Physics is based on how long the frame took, so it's necessary to limit it.
         LAST_UPDATE_TIME = CURRENT_TIME_MS;
+        
+        draw(graphics);
     }
 }
 
 void Game::draw(Graphics &graphics) {
+    graphics.clear();
     
+    _player.draw(graphics, 100, 100);
+    
+    graphics.flip();
 }
 
 void Game::update(float elapsedTime) {
-    
+    _player.update(elapsedTime);
 }
