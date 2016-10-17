@@ -20,7 +20,7 @@ void Input::beginNewFrame() {
 
 void Input::keyDownEvent(const SDL_Event &event) {
     _pressedKeys[event.key.keysym.scancode] = true;
-    _heldKeys[event.key.keysym.scancode];
+    _heldKeys[event.key.keysym.scancode] = true;
 }
 
 void Input::keyUpEvent(const SDL_Event &event) {

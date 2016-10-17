@@ -6,8 +6,8 @@
 //  Copyright © 2016 Nicholas Vanhaute. All rights reserved.
 //
 
-#ifndef ANIMATEDSPRITE_H
-#define ANIMATEDSPRITE_H
+#ifndef ANIMATED_SPRITE_H
+#define ANIMATED_SPRITE_H
 
 #include <map>
 #include <string>
@@ -40,11 +40,6 @@ public:
     // Draws the sprite to the screen
     
     void draw(Graphics &graphics, int x, int y);
-    
-    // virtual void setupAnimations
-    // A required function that sets up all animations for a sprite
-    
-    virtual void setupAnimations();
 protected:
     double _timeToUpdate;
     bool _currentAnimationOnce;
@@ -73,7 +68,12 @@ protected:
     // virtual void animationDone
     // Logic that occurs when an animation ends
     
-    virtual void animationDone(std::string currentAnimation);
+    virtual void animationDone(std::string currentAnimation) = 0;
+    
+    // virtual void setupAnimations
+    // A required function that sets up all animations for a sprite
+    
+    virtual void setupAnimations() = 0;
 private:
     std::map<std::string, std::vector<SDL_Rect>> _animations;
     std::map<std::string, Vector2> _offsets;
