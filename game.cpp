@@ -12,16 +12,18 @@
 #include "graphics.h"
 #include "input.h"
 
+/* Game class
+ * This class holds all information for our main game loop
+ */
+
 namespace {
     const int FPS = 50;
     const int MAX_FRAME_TIME = 5 * 1000 / FPS;
 }
-// Game Class:
-// Holds all the information for the main game loop.
 
 Game::Game() {
     SDL_Init(SDL_INIT_EVERYTHING);
-    gameLoop();
+    this->gameLoop();
 }
 
 Game::~Game() {
@@ -32,18 +34,18 @@ void Game::gameLoop() {
     Graphics graphics;
     Input input;
     SDL_Event event;
-    
-    _player = Player(graphics, 100, 100);
-    _level = Level("map 1", Vector2(100, 100), graphics);
-    
+
+    this->_level = Level("Map 1", Vector2(100, 100), graphics);
+    this->_player = Player(graphics, _level.getPlayerSpawnPoint());
     
     int LAST_UPDATE_TIME = SDL_GetTicks();
-    // Start game loop
+    //Start the game loop
     while (true) {
-        input.beginNewFrame(); // Resets pressed/released/held keys
+        input.beginNewFrame();
+        
         if (SDL_PollEvent(&event)) {
             if (event.type == SDL_KEYDOWN) {
-                if (event.key.repeat == 0) { // Makes sure that you aren't holding down a key
+                if (event.key.repeat == 0) {
                     input.keyDownEvent(event);
                 }
             }
@@ -54,41 +56,49 @@ void Game::gameLoop() {
                 return;
             }
         }
-        if (input.wasKeyPressed(SDL_SCANCODE_ESCAPE)) {
+        if (input.wasKeyPressed(SDL_SCANCODE_ESCAPE) == true) {
             return;
         }
-        else if (input.isKeyHeld(SDL_SCANCODE_LEFT)) {
-            _player.moveLeft();
+        else if (input.isKeyHeld(SDL_SCANCODE_LEFT) == true) {
+            this->_player.moveLeft();
         }
-        else if (input.isKeyHeld(SDL_SCANCODE_RIGHT)) {
-            _player.moveRight();
+        else if (input.isKeyHeld(SDL_SCANCODE_RIGHT) == true) {
+            this->_player.moveRight();
         }
         
         if (!input.isKeyHeld(SDL_SCANCODE_LEFT) && !input.isKeyHeld(SDL_SCANCODE_RIGHT)) {
-            _player.stopMoving();
+            this->_player.stopMoving();
         }
-        // Calculates how long the current frame took.
+        
         const int CURRENT_TIME_MS = SDL_GetTicks();
         int ELAPSED_TIME_MS = CURRENT_TIME_MS - LAST_UPDATE_TIME;
-        update(std::min(ELAPSED_TIME_MS, MAX_FRAME_TIME));
-        // If frame took more than max time, use max time. Limits game to 50 fps
-        // Physics is based on how long the frame took, so it's necessary to limit it.
+        this->update(std::min(ELAPSED_TIME_MS, MAX_FRAME_TIME));
         LAST_UPDATE_TIME = CURRENT_TIME_MS;
         
-        draw(graphics);
+        this->draw(graphics);
     }
 }
 
 void Game::draw(Graphics &graphics) {
     graphics.clear();
     
-    _level.draw(graphics);
-    _player.draw(graphics);
+    this->_level.draw(graphics);
+    this->_player.draw(graphics);
     
     graphics.flip();
 }
 
 void Game::update(float elapsedTime) {
-    _player.update(elapsedTime);
-    _level.update(elapsedTime);
+    this->_player.update(elapsedTime);
+    this->_level.update(elapsedTime);
+    
+    // Check collisions:
+    
+    std::vector<Rectangle> others;
+    
+    // If we have collisions...
+    if ((others = _level.checkTileCollisions(_player.getBoundingBox())).size() > 0) {
+        // Handle tile collisions.
+        _player.handleTileCollisions(others);
+    }
 }

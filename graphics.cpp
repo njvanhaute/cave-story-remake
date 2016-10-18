@@ -12,38 +12,40 @@
 #include "graphics.h"
 #include "globals.h"
 
-// Graphics Class:
-// Holds all information for dealing with graphics in the game.
+
+/* Graphics class
+ * Holds all information dealing with graphics for the game
+ */
 
 Graphics::Graphics() {
-    SDL_CreateWindowAndRenderer(globals::SCREEN_WIDTH, globals::SCREEN_HEIGHT, 0, &_window, &_renderer);
-    SDL_SetWindowTitle(_window, "Cave Story Remake");
+    SDL_CreateWindowAndRenderer(globals::SCREEN_WIDTH, globals::SCREEN_HEIGHT, 0, &this->_window, &this->_renderer);
+    SDL_SetWindowTitle(this->_window, "Cavestory");
 }
 
 Graphics::~Graphics() {
-    SDL_DestroyWindow(_window);
+    SDL_DestroyWindow(this->_window);
+    SDL_DestroyRenderer(this->_renderer);
 }
 
 SDL_Surface* Graphics::loadImage(const std::string &filePath) {
-    if (_spriteSheets.count(filePath) == 0) {
-        _spriteSheets[filePath] = IMG_Load(filePath.c_str());
+    if (this->_spriteSheets.count(filePath) == 0) {
+        this->_spriteSheets[filePath] = IMG_Load(filePath.c_str());
     }
-    return _spriteSheets[filePath];
+    return this->_spriteSheets[filePath];
 }
 
-void Graphics::blitSurface(SDL_Texture *source, SDL_Rect *sourceRectangle, SDL_Rect *destinationRectangle) {
-    SDL_RenderCopy(_renderer, source, sourceRectangle, destinationRectangle);
-    
+void Graphics::blitSurface(SDL_Texture* texture, SDL_Rect* sourceRectangle, SDL_Rect* destinationRectangle) {
+    SDL_RenderCopy(this->_renderer, texture, sourceRectangle, destinationRectangle);
 }
 
 void Graphics::flip() {
-    SDL_RenderPresent(_renderer);
+    SDL_RenderPresent(this->_renderer);
 }
 
 void Graphics::clear() {
-    SDL_RenderClear(_renderer);
+    SDL_RenderClear(this->_renderer);
 }
 
 SDL_Renderer* Graphics::getRenderer() const {
-    return _renderer;
+    return this->_renderer;
 }
